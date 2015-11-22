@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": { "description": "Location" }
+        },
+        "storageAccountResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "Description": "Storage account resource group for future cases when existing storage account is used"
+            }
+        },
+        "storageAccount": {
+            "type": "string",
+            "metadata": {
+                "Description": "The name of the new storage account to store the virtual machine disks"
+            }
+        },
+        "storageAccountType": {
+            "type": "string",
+            "metadata": { "description": "Storage account type" }
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[concat(parameters('storageAccount'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "accountType": "[parameters('storageAccountType')]"
+            }
+        }
+    ],
+    "outputs": {
+        "storageAccountId": {
+            "value": "[resourceId('Microsoft.Storage/StorageAccounts',parameters('storageAccount'))]",
+            "type": "string"
+        }
+    }
+}
