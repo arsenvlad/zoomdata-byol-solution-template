@@ -536,7 +536,7 @@
                     "fileUris": [
                         "[variables('scriptUrlInit')]"
                     ],
-                    "commandToExecute": "[concat('sh init.sh', ' -c ', parameters('company'), ' -f ', parameters('firstName'), ' -l ', parameters('lastName'), ' -e ', parameters('email'), ' -p ', parameters('businessPhone'), ' -r ', parameters('jobRole'), ' -j ', parameters('jobFunction'))]"
+                    "commandToExecute": "[concat('sh init.sh', ' -d ', reference('publicIP').outputs.fqdn.value, ' -c \"', parameters('company'), '\" -f \"', parameters('firstName'), '\" -l \"', parameters('lastName'), '\" -e \"', parameters('email'), '\" -p \"', parameters('businessPhone'), '\" -r \"', parameters('jobRole'), '\" -j \"', parameters('jobFunction'), '\"')]"
                 }
             }
         }
@@ -544,7 +544,7 @@
     "outputs": {
         "fqdn": {
             "type": "string",
-            "value": "[reference('publicIP').outputs.fqdn]"
+            "value": "[reference('publicIP').outputs.fqdn.value]"
         }
     }
 }

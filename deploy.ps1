@@ -11,7 +11,8 @@ Set-AzureSubscription -SubscriptionName "ArsenVlad MSDN Subscription"
 Get-AzureVMUsage -Location "West US"
 
 $AdminPassword = ConvertTo-SecureString -String "MyTest#123" -AsPlainText -Force
-$ResourceGroupName = "avzoomdata002"
+$SshPublicKey = "ssh-rsa YOUR SSH PUBLIC KEY HERE"
+$ResourceGroupName = "avzoomdata001"
 $Region = "westus"
 
 New-AzureResourceGroup -Name $ResourceGroupName -Location $Region
@@ -25,8 +26,27 @@ New-AzureResourceGroupDeployment -Name "mainTemplate" -ResourceGroupName $Resour
     -vmName $ResourceGroupName `
     -vmSize Standard_D2 `
     -adminUsername "azureuser" `
-    -adminPassword $AdminPassword `
+    -authenticationType sshPublicKey `
+    -sshPublicKey $SshPublicKey `
     -storageAccountNewOrExisting new -storageAccountFromTemplate $ResourceGroupName -storageAccountType "Standard_LRS" `
     -vnetNewOrExisting new `
-    -publicIPNewOrExisting new -publicIPAddressName "avzoomdata" -dnsName $ResourceGroupName
+    -publicIPNewOrExisting new -publicIPAddressName $ResourceGroupName -dnsName $ResourceGroupName `
+    -company "MyCompany" -firstName "FirstName" -lastName "LastName" -email "john@example.com" -businessPhone "5556667788" -jobRole "Job Role" -jobFunction "Job Function"
+Get-Date
+
+# Existing Storage Account, Existing Virtual Network, Existing Public IP
+Get-Date
+Write-Host $ResourceGroupName
+New-AzureResourceGroupDeployment -Name "mainTemplate" -ResourceGroupName $ResourceGroupName -TemplateFile mainTemplate.json -Force `
+    -location $Region `
+    -artifactsBaseUrl "https://templocistorage.blob.core.windows.net/zoomdata" `
+    -vmName $ResourceGroupName `
+    -vmSize Standard_D2 `
+    -adminUsername "azureuser" `
+    -authenticationType sshPublicKey `
+    -sshPublicKey $SshPublicKey `
+    -storageAccountNewOrExisting existing -storageAccountResourceGroup "avzoomdata001" -storageAccountFromTemplate "avzoomdata001" -storageAccountType "Standard_LRS" `
+    -vnetNewOrExisting existing -vnetResourceGroup "avzoomdata001" -vnetName "vnet-zoomdata" -subnet1Name "default" `
+    -publicIPNewOrExisting existing -publicIPAddressName "avzoomdata001" -publicIPAddressResourceGroup "avzoomdata001" `
+    -company "MyCompany" -firstName "FirstName" -lastName "LastName" -email "john@example.com" -businessPhone "5556667788" -jobRole "Job Role" -jobFunction "Job Function"
 Get-Date

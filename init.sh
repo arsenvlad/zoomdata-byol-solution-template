@@ -11,7 +11,7 @@ log()
 NOW=$(date +"%Y%m%d")
 
 # Get command line parameters
-while getopts "n:i:d:m:l:f:" opt; do
+while getopts "d:c:f:l:e:p:r:j:" opt; do
 	log "Option $opt set with value ${OPTARG})"
 	case "$opt" in
 		d)	DNS=$OPTARG
@@ -67,6 +67,9 @@ fi
 
 log "NOW=$NOW DNS=$DNS COMPANY=$COMPANY FIRSTNAME=$FIRSTNAME LASTNAME=$LASTNAME EMAIL=$EMAIL BUSINESSPHONE=$BUSINESSPHONE JOBROLE=$JOBROLE JOBFUNCTION=$JOBFUNCTION"
 
+# Inspect the POST request request by visiting this URL http://requestb.in/10wu9mx1?inspect
 curl -X POST -d "dns=$DNS&company=$COMPANY&firstName=$FIRSTNAME&lastName=$LASTNAME&email=$EMAIL&businessPhone=$BUSINESSPHONE&jobRole=$JOBROLE&jobFunction=$JOBFUNCTION" http://requestb.in/10wu9mx1
+
+
 
 
