@@ -206,7 +206,7 @@
     }
   },
   "variables": {
-    "apiVersion": {
+    "apiVersions": {
       "resources": {
         "deployments": "2016-02-01"
       },
@@ -253,7 +253,7 @@
   },
   "resources": [
     {
-      "apiVersion": "[variables('apiVersion').resources.deployments]",
+      "apiVersion": "[variables('apiVersions').resources.deployments]",
       "type": "Microsoft.Resources/deployments",
       "name": "storageAccount",
       "properties": {
@@ -264,7 +264,7 @@
         },
         "parameters": {
           "apiVersion": {
-            "value": "[variables('apiVersion')]"
+            "value": "[variables('apiVersions')]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -282,7 +282,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion').resources.deployments]",
+      "apiVersion": "[variables('apiVersions').resources.deployments]",
       "type": "Microsoft.Resources/deployments",
       "name": "vnet",
       "properties": {
@@ -293,7 +293,7 @@
         },
         "parameters": {
           "apiVersion": {
-            "value": "[variables('apiVersion')]"
+            "value": "[variables('apiVersions')]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -317,7 +317,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion').resources.deployments]",
+      "apiVersion": "[variables('apiVersions').resources.deployments]",
       "type": "Microsoft.Resources/deployments",
       "name": "publicIP",
       "properties": {
@@ -328,7 +328,7 @@
         },
         "parameters": {
           "apiVersion": {
-            "value": "[variables('apiVersion')]"
+            "value": "[variables('apiVersions')]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -349,7 +349,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion').network.networkSecurityGroups]",
+      "apiVersion": "[variables('apiVersions').network.networkSecurityGroups]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('networkSecurityGroupName')]",
       "location": "[parameters('location')]",
@@ -405,7 +405,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion').network.networkInterfaces]",
+      "apiVersion": "[variables('apiVersions').network.networkInterfaces]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('nicName')]",
       "location": "[parameters('location')]",
@@ -424,7 +424,7 @@
                 "id": "[variables('publicIPID')]"
               },
               "subnet": {
-                "id": "[reference('Microsoft.Resources/deployments/vnet',variables('apiVersion').resources.deployments).outputs.subnet1ID.value]"
+                "id": "[reference('Microsoft.Resources/deployments/vnet',variables('apiVersions').resources.deployments).outputs.subnet1ID.value]"
               }
             }
           }
@@ -435,7 +435,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion').compute.virtualMachines]",
+      "apiVersion": "[variables('apiVersions').compute.virtualMachines]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('vmName')]",
       "plan": {
@@ -484,7 +484,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion').compute.virtualMachineExtensions]",
+      "apiVersion": "[variables('apiVersions').compute.virtualMachineExtensions]",
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(parameters('vmName'), '/init')]",
       "location": "[parameters('location')]",
@@ -494,7 +494,7 @@
       "properties": {
         "publisher": "Microsoft.OSTCExtensions",
         "type": "CustomScriptForLinux",
-        "typeHandlerVersion": "1.8",
+        "typeHandlerVersion": "1.5",
         "settings": {
           "fileUris": [
             "[variables('scriptUrlInit')]"

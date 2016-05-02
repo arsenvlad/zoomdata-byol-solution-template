@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "apiVersion": {
+    "apiVersions": {
       "type": "object",
       "metadata": {
         "description": "Object with all relevant API versions passed from the mainTemplate"
@@ -30,7 +30,7 @@
     }
   },
   "variables": {
-    "apiVersion": "[parameters('apiVersion')]"
+    "apiVersions": "[parameters('apiVersions')]"
   },
   "resources": [
   ],

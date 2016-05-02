@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "apiVersion": {
+    "apiVersions": {
       "type": "object",
       "metadata": {
         "description": "Object with all relevant API versions passed from the mainTemplate"
@@ -46,14 +46,14 @@
     }
   },
   "variables": {
-    "apiVersion": "[parameters('apiVersion')]",
+    "apiVersions": "[parameters('apiVersions')]",
     "subnetNetworkSecurityGroupName": "[concat(parameters('vnetName'),'-','nsg')]",
     "vnetID": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
     "subnet1ID": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]"
   },
   "resources": [
     {
-      "apiVersion": "[variables('apiVersion').network.virtualNetworks]",
+      "apiVersion": "[variables('apiVersions').network.virtualNetworks]",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('vnetName')]",
       "location": "[parameters('location')]",
