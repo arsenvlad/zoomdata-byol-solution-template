@@ -1,63 +1,70 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "location": {
-            "type": "string",
-            "metadata": {
-                "description": "Location"
-            }
-        },
-        "publicIPAddressResourceGroup": {
-            "type": "string",
-            "metadata": {
-                "description": "Resource Group"
-            }
-        },
-        "publicIPAddressName": {
-            "type": "string",
-            "metadata": {
-                "description": "Public IP Address Name"
-            }
-        },
-        "publicIPAddressType": {
-            "type": "string",
-            "metadata": {
-                "description": "Public IP Address Type (e.g. Static or Dynamic)"
-            }
-        },
-        "dnsName": {
-            "type": "string",
-            "metadata": {
-                "description": "Public IP DNS prefix (e.g. [dnsName].region.cloudapp.azure.com)"
-            }
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "apiVersion": {
+      "type": "object",
+      "metadata": {
+        "description": "Object with all relevant API versions passed from the mainTemplate"
+      }
     },
-    "variables": {
-        "publicIPID": "[resourceId(parameters('publicIPAddressResourceGroup'),concat('Microsoft.Network','/','publicIPAddresses'),parameters('publicIPAddressName'))]"
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location"
+      }
     },
-    "resources": [
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[parameters('publicIPAddressName')]",
-            "location": "[parameters('location')]",
-            "properties": {
-                "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsName')]"
-                }
-            }
-        }
-    ],
-    "outputs": {
-        "publicIPID": {
-            "value": "[resourceId(concat('Microsoft.Network','/','publicIPAddresses'),parameters('publicIPAddressName'))]",
-            "type": "string"
-        },
-        "fqdn": {
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn]",
-            "type": "string"
-        }
+    "publicIPAddressResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource Group"
+      }
+    },
+    "publicIPAddressName": {
+      "type": "string",
+      "metadata": {
+        "description": "Public IP Address Name"
+      }
+    },
+    "publicIPAddressType": {
+      "type": "string",
+      "metadata": {
+        "description": "Public IP Address Type (e.g. Static or Dynamic)"
+      }
+    },
+    "dnsName": {
+      "type": "string",
+      "metadata": {
+        "description": "Public IP DNS prefix (e.g. [dnsName].region.cloudapp.azure.com)"
+      }
     }
+  },
+  "variables": {
+    "apiVersion": "[parameters('apiVersion')]",
+    "publicIPID": "[resourceId(parameters('publicIPAddressResourceGroup'),concat('Microsoft.Network','/','publicIPAddresses'),parameters('publicIPAddressName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('apiVersion').network.publicIPAddresses]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('publicIPAddressName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsName')]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "publicIPID": {
+      "value": "[resourceId(concat('Microsoft.Network','/','publicIPAddresses'),parameters('publicIPAddressName'))]",
+      "type": "string"
+    },
+    "fqdn": {
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName')), variables('apiVersion').network.publicIPAddresses).dnsSettings.fqdn]",
+      "type": "string"
+    }
+  }
 }

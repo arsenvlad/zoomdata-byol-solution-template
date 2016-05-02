@@ -1,336 +1,417 @@
 ﻿{
-    "handler": "Microsoft.Compute.MultiVm",
-    "version": "0.0.1-preview",
-    "parameters": {
-        "basics": [
-            {
-                "name": "vmName",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Virtual Machine Name",
-                "toolTip": "Virtual Machine Name",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[A-Z0-9a-z-]{1,30}$",
-                    "validationMessage": "Virtual Machine Name must be between 1 and 30 characters and can contain only lower case letters, numbers, and dashes."
-                }
-            },
-            {
-                "name": "adminUsername",
-                "type": "Microsoft.Compute.UserNameTextBox",
-                "label": "Admin Username",
-                "toolTip": "Admin username for the virtual machines",
-                "defaultValue": "",
-                "constraints": {
-                    "required": true
-                },
-                "osPlatform": "Linux"
-            },
-            {
-                "name": "adminCredentials",
-                "type": "Microsoft.Compute.CredentialsCombo",
-                "label": {
-                    "authenticationType": "Authentication Type",
-                    "password": "Admin Password",
-                    "confirmPassword": "Confirm Password",
-                    "sshPublicKey": "SSH Public Key"
-                },
-                "toolTip": {
-                    "authenticationType": "Which authentication type to use when connecting to the virtual machines: Password or SSH Public Key",
-                    "password": "Admin password for the virtual machines",
-                    "sshPublicKey": "Provide an OpenSSH public key, which can be generated with tools like ssh-keygen on Linux and OS X, or PuTTYGen on Windows."
-                },
-                "constraints": {
-                    "required": true
-                },
-                "options": {
-                    "hideConfirmation": false
-                },
-                "osPlatform": "Linux"
-            }
-        ],
-        "steps": [
-            {
-                "name": "infrastructureConfig",
-                "label": "Infrastructure settings",
-                "subLabel": {
-                    "preValidation": "Configure the infrastructure settings",
-                    "postValidation": "Done"
-                },
-                "bladeTitle": "Infrastructure settings",
-                "elements": [
-                    {
-                        "name": "vmSize",
-                        "type": "Microsoft.Compute.SizeSelector",
-                        "label": "Virtual machine size",
-                        "toolTip": "Size of the virtual machine",
-                        "recommendedSizes": [
-                            "Standard_A4",
-                            "Standard_A6",
-                            "Standard_D3"
-                        ],
-                        "constraints": {
-                            "allowedSizes": [
-                                "Standard_DS2",
-                                "Standard_DS3",
-                                "Standard_DS4",
-                                "Standard_DS11",
-                                "Standard_DS12",
-                                "Standard_DS13",
-                                "Standard_DS14",
-                                "Standard_D2",
-                                "Standard_D3",
-                                "Standard_D4",
-                                "Standard_D11",
-                                "Standard_D12",
-                                "Standard_D13",
-                                "Standard_D14",
-                                "Standard_D2_v2",
-                                "Standard_D3_v2",
-                                "Standard_D4_v2",
-                                "Standard_D5_v2",
-                                "Standard_D11_v2",
-                                "Standard_D12_v2",
-                                "Standard_D13_v2",
-                                "Standard_D14_v2",
-                                "Standard_G1",
-                                "Standard_G2",
-                                "Standard_G3",
-                                "Standard_G4",
-                                "Standard_G5",
-                                "Standard_GS1",
-                                "Standard_GS2",
-                                "Standard_GS3",
-                                "Standard_GS4",
-                                "Standard_GS5",
-                                "Standard_A3",
-                                "Standard_A4",
-                                "Standard_A5",
-                                "Standard_A6",
-                                "Standard_A7",
-                                "Standard_A8",
-                                "Standard_A9",
-                                "Standard_A10",
-                                "Standard_A11"
-                            ]
-                        },
-                        "osPlatform": "Linux",
-                        "imageReference": {
-                            "publisher": "zoomdata",
-                            "offer": "zoomdata-server",
-                            "sku": "server-byol",
-                            "version": "latest"
-                        },
-                        "count": 1
-                    },
-                    {
-                        "name": "storageAccount",
-                        "type": "Microsoft.Storage.StorageAccountSelector",
-                        "label": "Storage account",
-                        "toolTip": "Storage account for the disks of the virtual machine",
-                        "defaultValue": {
-                            "name": "[basics('vmName')]",
-                            "type": "Standard_LRS"
-                        }
-                    },
-                    {
-                        "name": "publicIP",
-                        "type": "Microsoft.Network.PublicIpAddressCombo",
-                        "label": {
-                            "publicIpAddress": "Public IP address name",
-                            "domainNameLabel": "Domain name label"
-                        },
-                        "toolTip": {
-                            "publicIpAddress": "Name of the public IP address object",
-                            "domainNameLabel": "DNS prefix to use for the public IP address (e.g. [dnsPrefix].region.cloudapp.azure.com)"
-                        },
-                        "defaultValue": {
-                            "publicIpAddressName": "[basics('vmName')]",
-                            "domainNameLabel": "[basics('vmName')]"
-                        },
-                        "options": {
-                            "hideNone": true,
-                            "hideDomainNameLabel": false
-                        }
-                    },
-                    {
-                        "name": "virtualNetwork",
-                        "type": "Microsoft.Network.VirtualNetworkCombo",
-                        "label": {
-                            "virtualNetwork": "Virtual network",
-                            "subnets": "Subnets"
-                        },
-                        "toolTip": {
-                            "virtualNetwork": "Virtual networks are logically isolated from each other in Azure. You can configure their IP address ranges, subnets, route tables, gateways, and security settings, much like a traditional network in your data center. Virtual machines in the same virtual network can access each other by default.",
-                            "subnets": "A subnet is a range of IP addresses in your virtual network, which can be used to isolated virtual machines from each other or from the Internet."
-                        },
-                        "defaultValue": {
-                            "name": "vnet-zoomdata",
-                            "addressPrefixSize": "/16"
-                        },
-                        "constraints": {
-                            "minAddressPrefixSize": "/29"
-                        },
-                        "subnets": {
-                            "subnet1": {
-                                "label": "Subnet 1",
-                                "defaultValue": {
-                                    "name": "default",
-                                    "addressPrefixSize": "/24"
-                                },
-                                "constraints": {
-                                    "minAddressPrefixSize": "/29",
-                                    "minAddressCount": 1,
-                                    "requireContiguousAddresses": false
-                                }
-                            }
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "userInfo",
-                "label": "User Information",
-                "subLabel": {
-                    "preValidation": "Provide user information",
-                    "postValidation": "Done"
-                },
-                "bladeTitle": "User Information",
-                "elements": [
-                    {
-                        "name": "companyName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Company name",
-                        "toolTip": "Provide your company name.",
-                        "constraints": {
-                            "required": true,
-                            "regex": "",
-                            "validationMessage": ""
-                        }
-                    },
-                    {
-                        "name": "firstName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "First name",
-                        "toolTip": "Provide your first name.",
-                        "constraints": {
-                            "required": true,
-                            "regex": "",
-                            "validationMessage": ""
-                        }
-                    },
-                    {
-                        "name": "lastName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Last name",
-                        "toolTip": "Provide your last name.",
-                        "constraints": {
-                            "required": true,
-                            "regex": "",
-                            "validationMessage": ""
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Email address",
-                        "toolTip": "Provide your email address in the format user@site.com",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-                            "validationMessage": "Please provide a valid email address"
-                        }
-                    },
-                    {
-                        "name": "businessPhone",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Business Phone",
-                        "toolTip": "Provide your business phone number, digits only",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^[0-9]+$",
-                            "validationMessage": "Please input digits only, no space, - or ()"
-                        }
-                    },
-                    {
-                        "name": "jobRole",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Job role",
-                        "toolTip": "Select your job role from dropdown box.",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues": [
-                                { "label": "Administrator", "value": "Administrator" },
-                                { "label": "Analyst (Industry/Finance)", "value": "Analyst (Industry/Finance)" },
-                                { "label": "Analyst (Technical)", "value": "Analyst (Technical)" },
-                                { "label": "Architect", "value": "Architect" },
-                                { "label": "C level", "value": "C level" },
-                                { "label": "Consultant", "value": "Consultant" },
-                                { "label": "Developer", "value": "Developer" },
-                                { "label": "Director", "value": "Director" },
-                                { "label": "Engineer", "value": "Engineer" },
-                                { "label": "Individual contributor", "value": "Individual contributor" },
-                                { "label": "Manager", "value": "Manager" },
-                                { "label": "Partner", "value": "Partner" },
-                                { "label": "Student", "value": "Student" },
-                                { "label": "VP", "value": "VP" }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "jobFunction",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Job function",
-                        "toolTip": "Select your job function from dropdown box.",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues": [
-                                { "label": "Analytics / Business Intelligence", "value": "Analytics / Business Intelligence" },
-                                { "label": "Big Data / Architecture", "value": "Big Data / Architecture" },
-                                { "label": "Data Warehouse / Management", "value": "Data Warehouse / Management" },
-                                { "label": "Data Science", "value": "Data Science" },
-                                { "label": "Database", "value": "Database" },
-                                { "label": "ETL / ELT", "value": "ETL / ELT" },
-                                { "label": "Infrastructure", "value": "Infrastructure" },
-                                { "label": "IT", "value": "IT" },
-                                { "label": "Marketing / Sales", "value": "Marketing / Sales" },
-                                { "label": "Networking", "value": "Networking" },
-                                { "label": "Manager", "value": "Manager" },
-                                { "label": "Security / Compliance", "value": "Security / Compliance" },
-                                { "label": "Storage", "value": "Storage" }
-                            ]
-                        }
-                    }
-                ]
-            }
-        ],
-        "outputs": {
-            "location": "[location()]",
-            "vmName": "[basics('vmName')]",
-            "adminUsername": "[basics('adminUsername')]",
-            "adminPassword": "[basics('adminCredentials').password]",
-            "sshPublicKey": "[basics('adminCredentials').sshPublicKey]",
-            "publicIPNewOrExisting": "[steps('infrastructureConfig').publicIP.newOrExistingOrNone]",
-            "publicIPAddressResourceGroup": "[steps('infrastructureConfig').publicIP.resourceGroup]",
-            "publicIPAddressName": "[steps('infrastructureConfig').publicIP.name]",
-            "dnsName": "[steps('infrastructureConfig').publicIP.domainNameLabel]",
-            "vmSize": "[steps('infrastructureConfig').vmSize]",
-            "storageAccountNewOrExisting": "[steps('infrastructureConfig').storageAccount.storageAccountNewOrExisting]",
-            "storageAccountResourceGroup": "[steps('infrastructureConfig').storageAccount.resourceGroup]",
-            "storageAccount": "[steps('infrastructureConfig').storageAccount.name]",
-            "storageAccountType": "[steps('infrastructureConfig').storageAccount.type]",
-            "vnetNewOrExisting": "[steps('infrastructureConfig').virtualNetwork.newOrExisting]",
-            "vnetResourceGroup": "[steps('infrastructureConfig').virtualNetwork.resourceGroup]",
-            "vnetName": "[steps('infrastructureConfig').virtualNetwork.name]",
-            "vnetAddressPrefix": "[steps('infrastructureConfig').virtualNetwork.addressPrefix]",
-            "subnet1Name": "[steps('infrastructureConfig').virtualNetwork.subnets.subnet1.name]",
-            "subnet1AddressPrefix": "[steps('infrastructureConfig').virtualNetwork.subnets.subnet1.addressPrefix]",
-            "company": "[steps('userInfo').company]",
-            "firstName": "[steps('userInfo').firstName]",
-            "lastName": "[steps('userInfo').lastName]",
-            "email": "[steps('userInfo').email]",
-            "businessPhone": "[steps('userInfo').businessPhone]",
-            "jobRole": "[steps('userInfo').jobRole]",
-            "jobFunction": "[steps('userInfo').jobFunction]"
+  "handler": "Microsoft.Compute.MultiVm",
+  "version": "0.0.1-preview",
+  "parameters": {
+    "basics": [
+      {
+        "name": "vmName",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Virtual Machine Name",
+        "toolTip": "Virtual Machine Name",
+        "constraints": {
+          "required": true,
+          "regex": "^[A-Z0-9a-z-]{1,30}$",
+          "validationMessage": "Virtual Machine Name must be between 1 and 30 characters and can contain only lower case letters, numbers, and dashes."
         }
+      },
+      {
+        "name": "adminUsername",
+        "type": "Microsoft.Compute.UserNameTextBox",
+        "label": "Admin Username",
+        "toolTip": "Admin username for the virtual machines",
+        "defaultValue": "",
+        "constraints": {
+          "required": true
+        },
+        "osPlatform": "Linux"
+      },
+      {
+        "name": "adminCredentials",
+        "type": "Microsoft.Compute.CredentialsCombo",
+        "label": {
+          "authenticationType": "Authentication Type",
+          "password": "Admin Password",
+          "confirmPassword": "Confirm Password",
+          "sshPublicKey": "SSH Public Key"
+        },
+        "toolTip": {
+          "authenticationType": "Which authentication type to use when connecting to the virtual machines: Password or SSH Public Key",
+          "password": "Admin password for the virtual machines",
+          "sshPublicKey": "Provide an OpenSSH public key, which can be generated with tools like ssh-keygen on Linux and OS X, or PuTTYGen on Windows."
+        },
+        "constraints": {
+          "required": true
+        },
+        "options": {
+          "hideConfirmation": false
+        },
+        "osPlatform": "Linux"
+      }
+    ],
+    "steps": [
+      {
+        "name": "infrastructureConfig",
+        "label": "Infrastructure settings",
+        "subLabel": {
+          "preValidation": "Configure the infrastructure settings",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Infrastructure settings",
+        "elements": [
+          {
+            "name": "vmSize",
+            "type": "Microsoft.Compute.SizeSelector",
+            "label": "Virtual machine size",
+            "toolTip": "Size of the virtual machine",
+            "recommendedSizes": [
+              "Standard_A4",
+              "Standard_A6",
+              "Standard_D3"
+            ],
+            "constraints": {
+              "allowedSizes": [
+                "Standard_DS2",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_DS11",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14",
+                "Standard_D2",
+                "Standard_D3",
+                "Standard_D4",
+                "Standard_D11",
+                "Standard_D12",
+                "Standard_D13",
+                "Standard_D14",
+                "Standard_D2_v2",
+                "Standard_D3_v2",
+                "Standard_D4_v2",
+                "Standard_D5_v2",
+                "Standard_D11_v2",
+                "Standard_D12_v2",
+                "Standard_D13_v2",
+                "Standard_D14_v2",
+                "Standard_G1",
+                "Standard_G2",
+                "Standard_G3",
+                "Standard_G4",
+                "Standard_G5",
+                "Standard_GS1",
+                "Standard_GS2",
+                "Standard_GS3",
+                "Standard_GS4",
+                "Standard_GS5",
+                "Standard_A3",
+                "Standard_A4",
+                "Standard_A5",
+                "Standard_A6",
+                "Standard_A7",
+                "Standard_A8",
+                "Standard_A9",
+                "Standard_A10",
+                "Standard_A11"
+              ]
+            },
+            "osPlatform": "Linux",
+            "imageReference": {
+              "publisher": "zoomdata",
+              "offer": "zoomdata-server",
+              "sku": "server-byol",
+              "version": "latest"
+            },
+            "count": 1
+          },
+          {
+            "name": "storageAccount",
+            "type": "Microsoft.Storage.StorageAccountSelector",
+            "label": "Storage account",
+            "toolTip": "Storage account for the disks of the virtual machine",
+            "defaultValue": {
+              "name": "[basics('vmName')]",
+              "type": "Standard_LRS"
+            }
+          },
+          {
+            "name": "publicIP",
+            "type": "Microsoft.Network.PublicIpAddressCombo",
+            "label": {
+              "publicIpAddress": "Public IP address name",
+              "domainNameLabel": "Domain name label"
+            },
+            "toolTip": {
+              "publicIpAddress": "Name of the public IP address object",
+              "domainNameLabel": "DNS prefix to use for the public IP address (e.g. [dnsPrefix].region.cloudapp.azure.com)"
+            },
+            "defaultValue": {
+              "publicIpAddressName": "[basics('vmName')]",
+              "domainNameLabel": "[basics('vmName')]"
+            },
+            "options": {
+              "hideNone": true,
+              "hideDomainNameLabel": false
+            }
+          },
+          {
+            "name": "virtualNetwork",
+            "type": "Microsoft.Network.VirtualNetworkCombo",
+            "label": {
+              "virtualNetwork": "Virtual network",
+              "subnets": "Subnets"
+            },
+            "toolTip": {
+              "virtualNetwork": "Virtual networks are logically isolated from each other in Azure. You can configure their IP address ranges, subnets, route tables, gateways, and security settings, much like a traditional network in your data center. Virtual machines in the same virtual network can access each other by default.",
+              "subnets": "A subnet is a range of IP addresses in your virtual network, which can be used to isolated virtual machines from each other or from the Internet."
+            },
+            "defaultValue": {
+              "name": "vnet-zoomdata",
+              "addressPrefixSize": "/16"
+            },
+            "constraints": {
+              "minAddressPrefixSize": "/29"
+            },
+            "subnets": {
+              "subnet1": {
+                "label": "Subnet 1",
+                "defaultValue": {
+                  "name": "default",
+                  "addressPrefixSize": "/24"
+                },
+                "constraints": {
+                  "minAddressPrefixSize": "/29",
+                  "minAddressCount": 1,
+                  "requireContiguousAddresses": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "userInfo",
+        "label": "User Information",
+        "subLabel": {
+          "preValidation": "Provide user information",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "User Information",
+        "elements": [
+          {
+            "name": "companyName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Company name",
+            "toolTip": "Provide your company name.",
+            "constraints": {
+              "required": true,
+              "regex": "",
+              "validationMessage": ""
+            }
+          },
+          {
+            "name": "firstName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "First name",
+            "toolTip": "Provide your first name.",
+            "constraints": {
+              "required": true,
+              "regex": "",
+              "validationMessage": ""
+            }
+          },
+          {
+            "name": "lastName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Last name",
+            "toolTip": "Provide your last name.",
+            "constraints": {
+              "required": true,
+              "regex": "",
+              "validationMessage": ""
+            }
+          },
+          {
+            "name": "email",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Email address",
+            "toolTip": "Provide your email address in the format user@site.com",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
+              "validationMessage": "Please provide a valid email address"
+            }
+          },
+          {
+            "name": "businessPhone",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Business Phone",
+            "toolTip": "Provide your business phone number, digits only",
+            "constraints": {
+              "required": true,
+              "regex": "^[0-9]+$",
+              "validationMessage": "Please input digits only, no space, - or ()"
+            }
+          },
+          {
+            "name": "jobRole",
+            "type": "Microsoft.Common.DropDown",
+            "label": "Job role",
+            "toolTip": "Select your job role from dropdown box.",
+            "constraints": {
+              "required": true,
+              "allowedValues": [
+                {
+                  "label": "Administrator",
+                  "value": "Administrator"
+                },
+                {
+                  "label": "Analyst (Industry/Finance)",
+                  "value": "Analyst (Industry/Finance)"
+                },
+                {
+                  "label": "Analyst (Technical)",
+                  "value": "Analyst (Technical)"
+                },
+                {
+                  "label": "Architect",
+                  "value": "Architect"
+                },
+                {
+                  "label": "C level",
+                  "value": "C level"
+                },
+                {
+                  "label": "Consultant",
+                  "value": "Consultant"
+                },
+                {
+                  "label": "Developer",
+                  "value": "Developer"
+                },
+                {
+                  "label": "Director",
+                  "value": "Director"
+                },
+                {
+                  "label": "Engineer",
+                  "value": "Engineer"
+                },
+                {
+                  "label": "Individual contributor",
+                  "value": "Individual contributor"
+                },
+                {
+                  "label": "Manager",
+                  "value": "Manager"
+                },
+                {
+                  "label": "Partner",
+                  "value": "Partner"
+                },
+                {
+                  "label": "Student",
+                  "value": "Student"
+                },
+                {
+                  "label": "VP",
+                  "value": "VP"
+                }
+              ]
+            }
+          },
+          {
+            "name": "jobFunction",
+            "type": "Microsoft.Common.DropDown",
+            "label": "Job function",
+            "toolTip": "Select your job function from dropdown box.",
+            "constraints": {
+              "required": true,
+              "allowedValues": [
+                {
+                  "label": "Analytics / Business Intelligence",
+                  "value": "Analytics / Business Intelligence"
+                },
+                {
+                  "label": "Big Data / Architecture",
+                  "value": "Big Data / Architecture"
+                },
+                {
+                  "label": "Data Warehouse / Management",
+                  "value": "Data Warehouse / Management"
+                },
+                {
+                  "label": "Data Science",
+                  "value": "Data Science"
+                },
+                {
+                  "label": "Database",
+                  "value": "Database"
+                },
+                {
+                  "label": "ETL / ELT",
+                  "value": "ETL / ELT"
+                },
+                {
+                  "label": "Infrastructure",
+                  "value": "Infrastructure"
+                },
+                {
+                  "label": "IT",
+                  "value": "IT"
+                },
+                {
+                  "label": "Marketing / Sales",
+                  "value": "Marketing / Sales"
+                },
+                {
+                  "label": "Networking",
+                  "value": "Networking"
+                },
+                {
+                  "label": "Manager",
+                  "value": "Manager"
+                },
+                {
+                  "label": "Security / Compliance",
+                  "value": "Security / Compliance"
+                },
+                {
+                  "label": "Storage",
+                  "value": "Storage"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "location": "[location()]",
+      "vmName": "[basics('vmName')]",
+      "adminUsername": "[basics('adminUsername')]",
+      "adminPassword": "[basics('adminCredentials').password]",
+      "sshPublicKey": "[basics('adminCredentials').sshPublicKey]",
+      "publicIPNewOrExisting": "[steps('infrastructureConfig').publicIP.newOrExistingOrNone]",
+      "publicIPAddressResourceGroup": "[steps('infrastructureConfig').publicIP.resourceGroup]",
+      "publicIPAddressName": "[steps('infrastructureConfig').publicIP.name]",
+      "dnsName": "[steps('infrastructureConfig').publicIP.domainNameLabel]",
+      "vmSize": "[steps('infrastructureConfig').vmSize]",
+      "storageAccountNewOrExisting": "[steps('infrastructureConfig').storageAccount.storageAccountNewOrExisting]",
+      "storageAccountResourceGroup": "[steps('infrastructureConfig').storageAccount.resourceGroup]",
+      "storageAccount": "[steps('infrastructureConfig').storageAccount.name]",
+      "storageAccountType": "[steps('infrastructureConfig').storageAccount.type]",
+      "vnetNewOrExisting": "[steps('infrastructureConfig').virtualNetwork.newOrExisting]",
+      "vnetResourceGroup": "[steps('infrastructureConfig').virtualNetwork.resourceGroup]",
+      "vnetName": "[steps('infrastructureConfig').virtualNetwork.name]",
+      "vnetAddressPrefix": "[steps('infrastructureConfig').virtualNetwork.addressPrefix]",
+      "subnet1Name": "[steps('infrastructureConfig').virtualNetwork.subnets.subnet1.name]",
+      "subnet1AddressPrefix": "[steps('infrastructureConfig').virtualNetwork.subnets.subnet1.addressPrefix]",
+      "company": "[steps('userInfo').company]",
+      "firstName": "[steps('userInfo').firstName]",
+      "lastName": "[steps('userInfo').lastName]",
+      "email": "[steps('userInfo').email]",
+      "businessPhone": "[steps('userInfo').businessPhone]",
+      "jobRole": "[steps('userInfo').jobRole]",
+      "jobFunction": "[steps('userInfo').jobFunction]"
     }
+  }
 }
