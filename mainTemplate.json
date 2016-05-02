@@ -217,7 +217,8 @@
         "virtualNetworks": "2016-03-30",
         "networkInterfaces": "2016-03-30",
         "loadBalancers": "2016-03-30",
-        "publicIPAddresses": "2016-03-30"
+        "publicIPAddresses": "2016-03-30",
+        "networkSecurityGroups": "2016-03-30"
       },
       "compute": {
         "availabilitySets": "2016-03-30",
@@ -262,6 +263,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "apiVersion": {
+            "value": "[variables('apiVersion')]"
+          },
           "location": {
             "value": "[parameters('location')]"
           },
@@ -288,6 +292,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "apiVersion": {
+            "value": "[variables('apiVersion')]"
+          },
           "location": {
             "value": "[parameters('location')]"
           },
@@ -320,6 +327,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "apiVersion": {
+            "value": "[variables('apiVersion')]"
+          },
           "location": {
             "value": "[parameters('location')]"
           },
@@ -414,7 +424,7 @@
                 "id": "[variables('publicIPID')]"
               },
               "subnet": {
-                "id": "[reference('Microsoft.Resources/deployments/vnet',variables('apiVersion').resource.deployments).outputs.subnet1ID.value]"
+                "id": "[reference('Microsoft.Resources/deployments/vnet',variables('apiVersion').resources.deployments).outputs.subnet1ID.value]"
               }
             }
           }

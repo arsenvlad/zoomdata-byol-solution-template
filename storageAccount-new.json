@@ -30,7 +30,7 @@
     }
   },
   "variables": {
-    "apiVersion": "[variables('apiVersion').network.publicIPAddresses]",
+    "apiVersion": "[parameters('apiVersion')]"
   },
   "resources": [
     {
