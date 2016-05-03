@@ -263,7 +263,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "apiVersion": {
+          "apiVersions": {
             "value": "[variables('apiVersions')]"
           },
           "location": {
@@ -292,7 +292,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "apiVersion": {
+          "apiVersions": {
             "value": "[variables('apiVersions')]"
           },
           "location": {
@@ -327,7 +327,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "apiVersion": {
+          "apiVersions": {
             "value": "[variables('apiVersions')]"
           },
           "location": {

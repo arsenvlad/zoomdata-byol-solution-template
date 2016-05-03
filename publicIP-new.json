@@ -40,7 +40,7 @@
     }
   },
   "variables": {
-    "apiVersion": "[parameters('apiVersions')]",
+    "apiVersions": "[parameters('apiVersions')]",
     "publicIPID": "[resourceId(parameters('publicIPAddressResourceGroup'),concat('Microsoft.Network','/','publicIPAddresses'),parameters('publicIPAddressName'))]"
   },
   "resources": [
